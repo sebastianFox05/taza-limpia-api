@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "framework": null,
+  "installCommand": "npm install --omit=dev",
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+}

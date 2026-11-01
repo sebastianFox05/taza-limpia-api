@@ -1,0 +1,78 @@
+@baseUrl = http://localhost:4000
+@email = cata@tazalimpia.test
+@password = {{$dotenv SEED_PASSWORD}}
+
+### Estado de la API
+GET {{baseUrl}}/
+
+### Catalogo completo
+GET {{baseUrl}}/coffees
+
+### Catalogo con operadores: lavados y naturales con 88 o mas
+GET {{baseUrl}}/coffees?process=lavado,natural&minScore=88&sort=altitude
+
+### Buscar por texto
+GET {{baseUrl}}/coffees?q=etiop
+
+### Estadisticas
+GET {{baseUrl}}/stats
+
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "{{email}}", "password": "{{password}}" }
+
+### Usuario actual
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{login.response.body.token}}
+
+### Crear cafe
+# @name created
+POST {{baseUrl}}/coffees
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "name": "Cajamarca lavado",
+  "country": "Perú",
+  "region": "Cajamarca",
+  "variety": "Typica",
+  "process": "lavado",
+  "roast": "medio",
+  "altitude": 1800,
+  "score": 85,
+  "notes": ["cacao", "nuez"],
+  "description": "Café de los Andes del norte de Perú, dulce y de acidez suave."
+}
+
+### Editar cafe
+PUT {{baseUrl}}/coffees/{{created.response.body.coffee._id}}
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{ "score": 86 }
+
+### Eliminar cafe
+DELETE {{baseUrl}}/coffees/{{created.response.body.coffee._id}}
+Authorization: Bearer {{login.response.body.token}}
+
+### Historial del panel
+GET {{baseUrl}}/stats/activity
+Authorization: Bearer {{login.response.body.token}}
+
+### Sin token: debe dar 401
+POST {{baseUrl}}/coffees
+Content-Type: application/json
+
+{ "name": "Sin permiso" }
+
+### Datos incompletos: debe dar 400
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "cata@tazalimpia.test" }
+
+### Ruta inexistente: debe dar 404
+GET {{baseUrl}}/no-existe
